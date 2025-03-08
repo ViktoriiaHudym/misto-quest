@@ -1,0 +1,58 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+*.log
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+/static/
+media/
+
+# Django migrations
+*.pyc
+__pycache__/
+challenges/migrations/__init__.pyc
+challenges/migrations/__pycache__/
+users/migrations/__init__.pyc
+users/migrations/__pycache__/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.pyenv/
+.virtualenv/
+env.bak/
+venv.bak/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# PyInstaller
+*.manifest
+*.spec
