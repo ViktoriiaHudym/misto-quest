@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('challenges/', views.get_challenges),
+    path('challenges/create/', views.create_challenge),
     path('challenges/<str:challenge_id>/', views.get_challenge),
 ]
