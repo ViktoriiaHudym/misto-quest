@@ -101,7 +101,7 @@ def complete_challenge(request):
     except UserChallenge.DoesNotExist:
         return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    user_challenge.user_complete_date = timezone.now()
+    user_challenge.user_complete_date = timezone.now().date()
     user_challenge.save()
     serializer = UserChallengeSerializer(user_challenge)
 
