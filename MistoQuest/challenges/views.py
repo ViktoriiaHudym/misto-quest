@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework import status
 from django.utils import timezone
 
@@ -10,6 +10,7 @@ from .models import Challenge, UserChallenge
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_challenges(request):
     challenges = Challenge.objects.all()
     serializer = ChallengeSerializer(challenges, many=True)
@@ -17,6 +18,7 @@ def get_challenges(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_challenge(request, challenge_id):
     challenge = Challenge.objects.get(id=challenge_id)
     serializer = ChallengeSerializer(challenge, many=False)
