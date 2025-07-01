@@ -4,7 +4,7 @@ import 'package:mistoquest_frontend/models/challenge.dart';
 
 
 class ApiService {
-  final String _baseUrl = 'http://example.com:8000';
+  final String _baseUrl = 'http://10.0.2.2:8000';
 
   // GET request to fetch a list of challenges
   Future<List<Challenge>> fetchChallenges() async {
