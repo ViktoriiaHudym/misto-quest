@@ -94,7 +94,7 @@ def delete_challenge(request, challenge_id):
 
 
 @api_view(['POST'])
-def complete_challenge(request):
+def complete_user_challenge(request):
     id_user = request.data.get('id_user')
     id_challenge = request.data.get('id_challenge')
 
@@ -104,7 +104,39 @@ def complete_challenge(request):
         return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user_challenge.user_complete_date = timezone.now().date()
+    user_challenge.user_complete_status = 2
     user_challenge.save()
     serializer = UserChallengeSerializer(user_challenge)
 
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def terminate_user_challenge(request):
+    id_user = request.data.get('id_user')
+    id_challenge = request.data.get('id_challenge')
+
+    try:
+        user_challenge = UserChallenge.objects.get(id_user=id_user, id_challenge=id_challenge)
+    except UserChallenge.DoesNotExist:
+        return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user_challenge.user_complete_status = 4
+    user_challenge.save()
+    serializer = UserChallengeSerializer(user_challenge)
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_user_challenges(request, user_id):
+    user_challenges = UserChallenge.objects.filter(id_user=user_id)
+
+    if not user_challenges.exists():
+        return Response(
+            {"message": f"No challenges found for user or user doesn't exist"},
+            status=status.HTTP_200_OK
+        )
+
+    serializer = UserChallengeSerializer(user_challenges, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)

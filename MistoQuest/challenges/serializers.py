@@ -18,4 +18,6 @@ class UserChallengeSerializer(ModelSerializer):
     class Meta:
         model = UserChallenge
         fields = '__all__'
-
+        extra_kwargs = {
+            'user_complete_date': {'required': False},
+        }
