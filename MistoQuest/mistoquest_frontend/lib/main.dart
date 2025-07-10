@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 // import 'screens/challenge_list_screen.dart';
+import 'screens/welcome_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 
 
 void main() {
@@ -23,7 +26,19 @@ class MyApp extends StatelessWidget {
       // home: const MyHomePage(title: 'Misto Quest'),
       title: 'MistoQuest',
       theme: appTheme(),
-      home: HomeScreen(),
+      // home: HomeScreen(),
+
+      // 1. Set the initial route to your new WelcomeScreen
+      initialRoute: WelcomeScreen.routeName,
+
+      // 2. Define all the possible routes for your app
+      routes: {
+        WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        RegisterScreen.routeName: (context) => const RegisterScreen(),
+        // You can still navigate to HomeScreen after a successful login
+        HomeScreen.routeName: (context) => HomeScreen(),
+      },
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+// import 'package:mistoquest_frontend/services/api_service.dart';
+// import 'package:mistoquest_frontend/models/challenge.dart';
 
+import '../models/challenge.dart';
+import '../services/api_service.dart';
 
 class ChallengeListScreen extends StatefulWidget {
   @override

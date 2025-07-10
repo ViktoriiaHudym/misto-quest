@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+// import 'package:mistoquest_frontend/models/challenge.dart';
+
+import '../models/challenge.dart';
 
 class ChallengeCard extends StatelessWidget {
   final VoidCallback onTap;
