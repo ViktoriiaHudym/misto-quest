@@ -1,9 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-// import 'package:mistoquest_frontend/models/challenge.dart';
-
-import '../models/challenge.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:mistoquest_frontend/models/challenge.dart';
 
 
 class ApiService {
@@ -72,9 +71,8 @@ class ApiService {
 
   // LOGIN METHOD
   Future<bool> login(String username, String password) async {
-    // The path is now '/users/login/'
     final response = await http.post(
-      Uri.parse('$_baseUrl/users/login/'), // <-- Corrected path
+      Uri.parse('$_baseUrl/users/login/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': username,
@@ -95,9 +93,8 @@ class ApiService {
 
   // REGISTER METHOD
   Future<bool> register(String username, String email, String password) async {
-    // The path is now '/users/register/'
     final response = await http.post(
-      Uri.parse('$_baseUrl/users/register/'), // <-- Corrected path
+      Uri.parse('$_baseUrl/users/register/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': username,

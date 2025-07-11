@@ -6,7 +6,7 @@ from .views import register
 urlpatterns = [
     path('register/', register, name='register'),
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # Keep one refresh path
-    path('profile/', views.get_profile, name='get_profile'), # Corrected path
-    path('stats/<str:username>/', views.get_statistics, name='get_statistics'), # Added trailing slash
+    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('profile/<str:username>', views.get_profile, name='get_profile'),
+    path('stats/<str:username>/', views.get_statistics, name='get_statistics'),
 ]
