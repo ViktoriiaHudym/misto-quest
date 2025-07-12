@@ -1,7 +1,6 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
-import 'home_screen.dart';
+import 'package:mistoquest_frontend/services/api_service.dart';
+import 'package:mistoquest_frontend/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = '/login';

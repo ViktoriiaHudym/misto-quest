@@ -1,7 +1,6 @@
-// lib/screens/register_screen.dart
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
-import 'login_screen.dart';
+import 'package:mistoquest_frontend/services/api_service.dart';
+import 'package:mistoquest_frontend/screens/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = '/register';
