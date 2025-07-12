@@ -22,15 +22,15 @@ class AppBottomNavBar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.star_border),
-          label: 'Featured',
+          label: 'Усі квести',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.check_circle_outline),
-          label: 'Participating',
+          label: 'Мої квести',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
-          label: 'Account',
+          label: 'Профіль',
         ),
       ],
     );

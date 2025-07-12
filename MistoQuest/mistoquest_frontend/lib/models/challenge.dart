@@ -48,13 +48,15 @@ class UserChallenge {
   final int idUser;
   final int idChallenge;
   final DateTime userPickUpDate;
-  final DateTime userCompleteDate;
+  final DateTime? userCompleteDate;
+  final int userCompleteStatus;
 
   UserChallenge({
     required this.idUser,
     required this.idChallenge,
     required this.userPickUpDate,
     required this.userCompleteDate,
+    required this.userCompleteStatus,
   });
 
   // Factory constructor to create a UserChallenge from JSON
@@ -63,7 +65,10 @@ class UserChallenge {
       idUser: json['id_user'],
       idChallenge: json['id_challenge'],
       userPickUpDate: DateTime.parse(json['user_pick_up_date']),
-      userCompleteDate: DateTime.parse(json['user_complete_date']),
+      userCompleteDate: json['user_complete_date'] != null && json['user_complete_date'] != ''
+          ? DateTime.parse(json['user_complete_date'])
+          : null,
+      userCompleteStatus: json['user_complete_status'],
     );
   }
 
@@ -73,7 +78,8 @@ class UserChallenge {
       'id_user': idUser,
       'id_challenge': idChallenge,
       'user_pick_up_date': userPickUpDate.toIso8601String(),
-      'user_complete_date': userCompleteDate.toIso8601String(),
+      'user_complete_date': userCompleteDate?.toIso8601String(),
+      'user_complete_status': userCompleteStatus,
     };
   }
 }

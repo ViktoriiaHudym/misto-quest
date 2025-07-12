@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mistoquest_frontend/services/api_service.dart';
 import 'package:mistoquest_frontend/models/challenge.dart';
 import 'package:mistoquest_frontend/widgets/app_bottom_nav_bar.dart';
+import 'user_participation_screen.dart';
+import '../widgets/challenge_slider_card.dart';
 
 class HomeScreen extends StatefulWidget {
+  static const String routeName = '/home';
+
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
@@ -41,9 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case 1:
       // Participating Challenges
-        content = const Center(
-          child: Text('Participating Challenges screen (to be implemented)'),
-        );
+        content = const UserParticipationScreen();
         break;
       case 2:
       // Account & Settings
@@ -86,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'Featured Challenges',
+            'Квести доступні у твоєму місті',
             style: Theme.of(context)
                 .textTheme
                 ?.headlineSmall
@@ -104,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             itemBuilder: (context, index) {
               final challenge = challenges[index];
-              return _ChallengeCard(challenge: challenge);
+              return ChallengeSliderCard(challenge: challenge);
             },
           ),
         ),
@@ -114,41 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
         ),
       ],
-    );
-  }
-}
-
-class _ChallengeCard extends StatelessWidget {
-  final Challenge challenge;
-  const _ChallengeCard({Key? key, required this.challenge}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              challenge.title,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              challenge.description,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Spacer(),
-            Text('Points: ${challenge.points}'),
-          ],
-        ),
-      ),
     );
   }
 }
