@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-// import 'package:mistoquest_frontend/utils/utils.dart';
+import 'package:mistoquest_frontend/utils/utils.dart';
 
-import '../utils/utils.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
