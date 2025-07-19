@@ -8,8 +8,6 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 
-from django.contrib.auth import get_user_model
-
 
 from .serializers import UserSerializer, UserStatsSerializer, RegisterSerializer
 from .models import UserStats

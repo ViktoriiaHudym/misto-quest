@@ -84,6 +84,34 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
     }
   }
 
+  Future<void> _stopParticipation(int challengeId) async {
+    try {
+      await _apiService.terminateChallenge(_userId, challengeId);
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Participation stopped!'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      // Refresh the challenges list
+      setState(() {
+        _userChallengesFuture = _apiService.fetchUserChallenges(userId: _userId);
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to stop participation: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   void _showFilterDialog() {
     showDialog(
       context: context,
@@ -291,9 +319,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: OutlinedButton(
-                                                onPressed: () {
-                                                  // TODO: Implement stop participation
-                                                },
+                                                onPressed: () => _stopParticipation(userChallenge.idChallenge),
                                                 child: const Text('Stop Participation'),
                                               ),
                                             ),

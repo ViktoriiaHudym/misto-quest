@@ -86,4 +86,20 @@ class ApiService {
     }
     throw Exception('Failed to complete challenge: ${response.body}');
   }
+
+// POST request to mark a challenge as terminated
+  Future<bool> terminateChallenge(int userId, int challengeId) async {
+    final response = await _client.post(
+      Uri.parse('$_baseUrl/user/terminate_challenge'),
+      headers: _headers,
+      body: jsonEncode({
+        'id_user': userId,
+        'id_challenge': challengeId,
+      }),
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    throw Exception('Failed to terminate challenge: ${response.body}');
+  }
 }
