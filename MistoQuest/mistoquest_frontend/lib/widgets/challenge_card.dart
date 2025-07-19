@@ -37,6 +37,7 @@ class ChallengeCard extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
             Text(
               challenge.title,
               style: const TextStyle(
@@ -46,17 +47,19 @@ class ChallengeCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
-            Text(
-              challenge.description,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w200,
+            Expanded(
+              child: Text(
+                challenge.description,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w200,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: onTap,
               style: ElevatedButton.styleFrom(

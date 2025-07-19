@@ -18,7 +18,7 @@ class Challenge(models.Model):
         default='easy',
     )
 
-    created_date = models.DateField(default=timezone.now().date())
+    created_date = models.DateField(default=timezone.now)
     max_duration = models.IntegerField(default=7)
 
     points = models.IntegerField(default=0)
@@ -36,7 +36,19 @@ class UserChallenge(models.Model):
     id_user = models.ForeignKey(User, on_delete=models.CASCADE)
     id_challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     user_pick_up_date = models.DateField(default=timezone.now)
-    user_complete_date = models.DateField(default=timezone.now)
+    user_complete_date = models.DateField(null=True, blank=True)
+
+    USER_STATUS_CHOICES = [
+        (0, 'Not Started'),
+        (1, 'In Progress'),
+        (2, 'Completed'),
+        (3, 'Failed'),
+        (4, 'Terminated'),
+    ]
+    user_complete_status = models.IntegerField(
+        choices=USER_STATUS_CHOICES,
+        default=0
+    )
 
     def __str__(self):
         return f"{self.id_user.username} - {self.id_challenge.title}"
