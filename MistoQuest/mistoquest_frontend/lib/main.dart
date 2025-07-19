@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-import 'screens/user_participation_screen.dart';
-
+import 'package:mistoquest_frontend/screens/home_screen.dart';
+import 'package:mistoquest_frontend/screens/welcome_screen.dart';
+import 'package:mistoquest_frontend/screens/login_screen.dart';
+import 'package:mistoquest_frontend/screens/register_screen.dart';
+import 'package:mistoquest_frontend/screens/user_participation_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,13 +18,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'MistoQuest',
       theme: appTheme(),
-      home: HomeScreen(),
+      initialRoute: WelcomeScreen.routeName,
 
       routes: {
+        WelcomeScreen.routeName: (context) => const WelcomeScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        RegisterScreen.routeName: (context) => const RegisterScreen(),
         HomeScreen.routeName: (context) => HomeScreen(),
         UserParticipationScreen.routeName: (context) => UserParticipationScreen(),
       },
-
     );
   }
 }

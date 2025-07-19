@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:mistoquest_frontend/models/challenge.dart';
 import '../config.dart';
 
@@ -7,10 +9,16 @@ import '../config.dart';
 class ApiService {
   final http.Client _client;
   final String _baseUrl = apiBaseUrl;
+  final _storage = const FlutterSecureStorage();
 
   Map<String, String> get _headers => {'Content-Type': 'application/json'};
 
   ApiService({http.Client? client}) : _client = client ?? http.Client();
+
+    // Method to get the stored token
+  Future<String?> _getToken() async {
+    return await _storage.read(key: 'access_token');
+  }
 
   // GET request to fetch a list of challenges
   Future<List<Challenge>> fetchChallenges() async {
@@ -101,5 +109,47 @@ class ApiService {
       return true;
     }
     throw Exception('Failed to terminate challenge: ${response.body}');
+  }
+
+  // LOGIN METHOD
+  Future<bool> login(String username, String password) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/users/login/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': username,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      await _storage.write(key: 'access_token', value: data['access']);
+      await _storage.write(key: 'refresh_token', value: data['refresh']);
+      return true;
+    } else {
+      print('Login failed! Status: ${response.statusCode}, Body: ${response.body}');
+      return false;
+    }
+  }
+
+  // REGISTER METHOD
+  Future<bool> register(String username, String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/users/register/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': username,
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      print('Register failed! Status: ${response.statusCode}, Body: ${response.body}');
+      return false;
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:mistoquest_frontend/widgets/app_bottom_nav_bar.dart';
 import 'user_participation_screen.dart';
 import '../widgets/challenge_slider_card.dart';
 
+
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home';
 
