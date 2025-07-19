@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:mistoquest_frontend/models/challenge.dart';
-import '../config.dart';
+import 'package:mistoquest_frontend/config.dart';
 
 
 class ApiService {
@@ -32,7 +32,7 @@ class ApiService {
 
   // POST request to create a new challenge
   Future<Challenge> createChallenge(Map<String, dynamic> challengeData) async {
-    final response = await _client.post(Uri.parse('$_baseUrl/challenges'),
+    final response = await _client.post(Uri.parse('$_baseUrl/challenges/create/'),
       headers: _headers,
       body: jsonEncode(challengeData),
     );
@@ -44,7 +44,7 @@ class ApiService {
 
   // PUT request to update a challenge
   Future<Challenge> updateChallenge(int id, Map<String, dynamic> challengeData) async {
-    final response = await _client.put(Uri.parse('$_baseUrl/challenges/$id'),
+    final response = await _client.put(Uri.parse('$_baseUrl/challenges/$id/update/'),
       headers: _headers,
       body: jsonEncode(challengeData),
     );
@@ -56,7 +56,7 @@ class ApiService {
 
   // GET request to fetch challenges for a specific user (user_id is hardcoded for now)
   Future<List<UserChallenge>> fetchUserChallenges({int userId = 1}) async {
-    final response = await _client.get(Uri.parse('$_baseUrl/user/$userId/challenges/'));
+    final response = await _client.get(Uri.parse('$_baseUrl/challenges/user/$userId/'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data is List) {
@@ -82,7 +82,7 @@ class ApiService {
   // POST request to mark a challenge as completed
   Future<bool> completeChallenge(int userId, int challengeId) async {
     final response = await _client.post(
-      Uri.parse('$_baseUrl/user/complete_challenge'),
+      Uri.parse('$_baseUrl/challenges/user/complete_challenge'),
       headers: _headers,
       body: jsonEncode({
         'id_user': userId,
@@ -98,7 +98,7 @@ class ApiService {
 // POST request to mark a challenge as terminated
   Future<bool> terminateChallenge(int userId, int challengeId) async {
     final response = await _client.post(
-      Uri.parse('$_baseUrl/user/terminate_challenge'),
+      Uri.parse('$_baseUrl/challenges/user/terminate_challenge'),
       headers: _headers,
       body: jsonEncode({
         'id_user': userId,
