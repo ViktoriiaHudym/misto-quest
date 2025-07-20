@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+import '../services/api_service.dart';
+import '../models/challenge.dart';
 
 
 class ChallengeListScreen extends StatefulWidget {
+  const ChallengeListScreen({super.key});
+
   @override
-  _ChallengeListScreenState createState() => _ChallengeListScreenState();
+  ChallengeListScreenState createState() => ChallengeListScreenState();
 }
 
-class _ChallengeListScreenState extends State<ChallengeListScreen> {
+class ChallengeListScreenState extends State<ChallengeListScreen> {
   late ApiService apiService;
   late Future<List<Challenge>> challenges;
 
@@ -23,17 +25,17 @@ class _ChallengeListScreenState extends State<ChallengeListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Challenges'),
+        title: const Text('Challenges'),
       ),
       body: FutureBuilder<List<Challenge>>(
         future: challenges,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No challenges available.'));
+            return const Center(child: Text('No challenges available.'));
           } else {
             final challengeList = snapshot.data!;
             return ListView.builder(

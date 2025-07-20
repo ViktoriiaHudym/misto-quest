@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'package:mistoquest_frontend/screens/home_screen.dart';
-import 'package:mistoquest_frontend/screens/welcome_screen.dart';
-import 'package:mistoquest_frontend/screens/login_screen.dart';
-import 'package:mistoquest_frontend/screens/register_screen.dart';
-import 'package:mistoquest_frontend/screens/user_participation_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/welcome_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/user_participation_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
         WelcomeScreen.routeName: (context) => const WelcomeScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         RegisterScreen.routeName: (context) => const RegisterScreen(),
-        HomeScreen.routeName: (context) => HomeScreen(),
-        UserParticipationScreen.routeName: (context) => UserParticipationScreen(),
+        HomeScreen.routeName: (context) => const HomeScreen(),
+        UserParticipationScreen.routeName: (context) => const UserParticipationScreen(),
       },
     );
   }

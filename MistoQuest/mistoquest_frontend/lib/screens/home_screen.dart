@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
-import 'package:mistoquest_frontend/widgets/app_bottom_nav_bar.dart';
+import '../services/api_service.dart';
+import '../models/challenge.dart';
+import '../widgets/app_bottom_nav_bar.dart';
 import 'user_participation_screen.dart';
 import '../widgets/challenge_slider_card.dart';
 
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
             'Квести доступні у твоєму місті',
             style: Theme.of(context)
                 .textTheme
-                ?.headlineSmall
+                .headlineSmall
                 ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),

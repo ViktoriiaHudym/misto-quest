@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/screens/login_screen.dart';
+import '../services/api_service.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routeName = '/register';
@@ -36,11 +36,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _passwordController.text,
     );
 
+    if (!mounted) return;
+
     setState(() {
       _isLoading = false;
     });
 
-    if (success && mounted) {
+    if (success) {
       // Show success message and navigate to login screen
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration Successful! Please log in.')),

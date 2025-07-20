@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/screens/home_screen.dart';
+import '../services/api_service.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String routeName = '/login';
@@ -33,11 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
       _passwordController.text,
     );
 
+    if (!mounted) return;
+
     setState(() {
       _isLoading = false;
     });
 
-    if (success && mounted) {
+    if (success) {
       // Navigate to home screen on successful login
       Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     } else {
