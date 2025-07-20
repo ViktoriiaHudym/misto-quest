@@ -155,7 +155,7 @@ class ApiService {
   // REGISTER METHOD
   Future<bool> register(String username, String email, String password) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/users/profile/'),
+      Uri.parse('$_baseUrl/users/register_user/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': username,
