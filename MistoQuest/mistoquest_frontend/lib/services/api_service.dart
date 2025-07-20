@@ -1,9 +1,10 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
-import 'package:mistoquest_frontend/models/challenge.dart';
-import 'package:mistoquest_frontend/config.dart';
+import '../models/challenge.dart';
+import '../config.dart';
 
 
 class ApiService {
@@ -43,8 +44,8 @@ class ApiService {
   }
 
   // PUT request to update a challenge
-  Future<Challenge> updateChallenge(int id, Map<String, dynamic> challengeData) async {
-    final response = await _client.put(Uri.parse('$_baseUrl/challenges/$id/update/'),
+  Future<Challenge> updateChallenge(int challengeId, Map<String, dynamic> challengeData) async {
+    final response = await _client.put(Uri.parse('$_baseUrl/challenges/$challengeId/update/'),
       headers: _headers,
       body: jsonEncode(challengeData),
     );
@@ -54,9 +55,29 @@ class ApiService {
     throw Exception('Failed to update challenge: ${response.body}');
   }
 
-  // GET request to fetch challenges for a specific user (user_id is hardcoded for now)
-  Future<List<UserChallenge>> fetchUserChallenges({int userId = 1}) async {
-    final response = await _client.get(Uri.parse('$_baseUrl/challenges/user/$userId/'));
+  // Helper to get userId from JWT
+  Future<int?> getUserIdFromToken() async {
+    String? token = await _getToken();
+    if (token == null) return null;
+    Map<String, dynamic> payload = Jwt.parseJwt(token);
+    return payload['user_id'] ?? payload['id'];
+  }
+
+  // Helper to get headers with Authorization
+  Future<Map<String, String>> _authHeaders() async {
+    final token = await _getToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  // GET request to fetch challenges for the authenticated user
+  Future<List<UserChallenge>> fetchUserChallenges() async {
+    final response = await _client.get(
+      Uri.parse('$_baseUrl/challenges/user/'),
+      headers: await _authHeaders(),
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data is List) {
@@ -79,13 +100,12 @@ class ApiService {
     throw Exception('Failed to load challenge: ${response.statusCode}');
   }
 
-  // POST request to mark a challenge as completed
-  Future<bool> completeChallenge(int userId, int challengeId) async {
+  // POST request to mark a challenge as completed (no userId in body)
+  Future<bool> completeChallenge(int challengeId) async {
     final response = await _client.post(
       Uri.parse('$_baseUrl/challenges/user/complete_challenge'),
-      headers: _headers,
+      headers: await _authHeaders(),
       body: jsonEncode({
-        'id_user': userId,
         'id_challenge': challengeId,
       }),
     );
@@ -95,13 +115,12 @@ class ApiService {
     throw Exception('Failed to complete challenge: ${response.body}');
   }
 
-// POST request to mark a challenge as terminated
-  Future<bool> terminateChallenge(int userId, int challengeId) async {
+  // POST request to mark a challenge as terminated (no userId in body)
+  Future<bool> terminateChallenge(int challengeId) async {
     final response = await _client.post(
       Uri.parse('$_baseUrl/challenges/user/terminate_challenge'),
-      headers: _headers,
+      headers: await _authHeaders(),
       body: jsonEncode({
-        'id_user': userId,
         'id_challenge': challengeId,
       }),
     );
@@ -128,7 +147,7 @@ class ApiService {
       await _storage.write(key: 'refresh_token', value: data['refresh']);
       return true;
     } else {
-      print('Login failed! Status: ${response.statusCode}, Body: ${response.body}');
+      // print('Login failed! Status: ${response.statusCode}, Body: ${response.body}');
       return false;
     }
   }
@@ -136,7 +155,7 @@ class ApiService {
   // REGISTER METHOD
   Future<bool> register(String username, String email, String password) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/users/register/'),
+      Uri.parse('$_baseUrl/users/profile/'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'username': username,
@@ -148,7 +167,7 @@ class ApiService {
     if (response.statusCode == 201) {
       return true;
     } else {
-      print('Register failed! Status: ${response.statusCode}, Body: ${response.body}');
+      // print('Register failed! Status: ${response.statusCode}, Body: ${response.body}');
       return false;
     }
   }

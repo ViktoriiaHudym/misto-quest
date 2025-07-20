@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/services/api_service.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+import '../services/api_service.dart';
+import '../models/challenge.dart';
 
 
-const USER_STATUS_CHOICES = [
+const userStatusChoices = [
   'Not Started',
   'In Progress',
   'Completed',
@@ -37,12 +37,11 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
   late Future<List<UserChallenge>> _userChallengesFuture;
   int? _selectedStatusFilter;
   final ApiService _apiService = ApiService();
-  final int _userId = 1; // Hardcoded user ID for now
 
   @override
   void initState() {
     super.initState();
-    _userChallengesFuture = _apiService.fetchUserChallenges(userId: _userId);
+    _userChallengesFuture = _apiService.fetchUserChallenges();
   }
 
   List<UserChallenge> _filterChallenges(List<UserChallenge> challenges) {
@@ -56,7 +55,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
 
   Future<void> _markAsCompleted(int challengeId) async {
     try {
-      await _apiService.completeChallenge(_userId, challengeId);
+      await _apiService.completeChallenge(challengeId);
       
       // Show success message
       if (mounted) {
@@ -70,7 +69,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
 
       // Refresh the challenges list
       setState(() {
-        _userChallengesFuture = _apiService.fetchUserChallenges(userId: _userId);
+        _userChallengesFuture = _apiService.fetchUserChallenges();
       });
     } catch (e) {
       if (mounted) {
@@ -86,7 +85,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
 
   Future<void> _stopParticipation(int challengeId) async {
     try {
-      await _apiService.terminateChallenge(_userId, challengeId);
+      await _apiService.terminateChallenge(challengeId);
       // Show success message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +97,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
       }
       // Refresh the challenges list
       setState(() {
-        _userChallengesFuture = _apiService.fetchUserChallenges(userId: _userId);
+        _userChallengesFuture = _apiService.fetchUserChallenges();
       });
     } catch (e) {
       if (mounted) {
@@ -134,9 +133,9 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                   },
                 ),
               ),
-              ...List.generate(USER_STATUS_CHOICES.length, (index) {
+              ...List.generate(userStatusChoices.length, (index) {
                 return ListTile(
-                  title: Text(USER_STATUS_CHOICES[index]),
+                  title: Text(userStatusChoices[index]),
                   leading: Radio<int?>(
                     value: index,
                     groupValue: _selectedStatusFilter,
@@ -190,7 +189,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                     const Icon(Icons.filter_list_off, size: 64, color: Colors.grey),
                     const SizedBox(height: 16),
                     Text(
-                      'No challenges with status "${_selectedStatusFilter != null ? USER_STATUS_CHOICES[_selectedStatusFilter!] : 'All'}"',
+                      'No challenges with status "${_selectedStatusFilter != null ? userStatusChoices[_selectedStatusFilter!] : 'All'}"',
                       style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -223,7 +222,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                       return Card(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: ListTile(
-                          title: Text('Error loading challenge'),
+                          title: const Text('Error loading challenge'),
                           subtitle: Text('ID: ${userChallenge.idChallenge}'),
                         ),
                       );
@@ -231,7 +230,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                       return Card(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: ListTile(
-                          title: Text('Challenge not found'),
+                          title: const Text('Challenge not found'),
                           subtitle: Text('ID: ${userChallenge.idChallenge}'),
                         ),
                       );
@@ -245,7 +244,7 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: getStatusColor(status).withAlpha((0.1 * 255).toInt()),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -285,11 +284,11 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                             decoration: BoxDecoration(
-                                              color: getStatusColor(status).withOpacity(0.2),
+                                              color: getStatusColor(status).withAlpha((0.2 * 255).toInt()),
                                               borderRadius: BorderRadius.circular(8),
                                             ),
                                             child: Text(
-                                              USER_STATUS_CHOICES[status],
+                                              userStatusChoices[status],
                                               style: TextStyle(
                                                 color: getStatusColor(status),
                                                 fontWeight: FontWeight.bold,
