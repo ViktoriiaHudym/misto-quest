@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/screens/login_screen.dart';
-import 'package:mistoquest_frontend/screens/register_screen.dart';
+import 'login_screen.dart';
+import 'register_screen.dart';
 
 
 class WelcomeScreen extends StatelessWidget {

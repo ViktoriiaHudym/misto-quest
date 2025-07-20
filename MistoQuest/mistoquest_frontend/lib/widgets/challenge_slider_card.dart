@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+import '../models/challenge.dart';
 
 class ChallengeSliderCard extends StatelessWidget {
   final Challenge challenge;

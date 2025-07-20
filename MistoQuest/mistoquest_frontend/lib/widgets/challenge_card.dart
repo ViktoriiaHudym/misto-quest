@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mistoquest_frontend/models/challenge.dart';
+import '../models/challenge.dart';
 
 
 class ChallengeCard extends StatelessWidget {
@@ -28,7 +28,7 @@ class ChallengeCard extends StatelessWidget {
               child: Container(
                 height: 190,
                 width: 190,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: AssetImage('assets/Challenge-PNG-File.png'),  // Use placeholder or image for the challenge
