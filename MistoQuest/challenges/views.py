@@ -94,13 +94,12 @@ def delete_challenge(request, challenge_id):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def complete_user_challenge(request):
-    id_user = request.data.get('id_user')
     id_challenge = request.data.get('id_challenge')
 
     try:
-        user_challenge = UserChallenge.objects.get(id_user=id_user, id_challenge=id_challenge)
+        user_challenge = UserChallenge.objects.get(id_user=request.user, id_challenge=id_challenge)
     except UserChallenge.DoesNotExist:
         return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -113,13 +112,12 @@ def complete_user_challenge(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def terminate_user_challenge(request):
-    id_user = request.data.get('id_user')
     id_challenge = request.data.get('id_challenge')
 
     try:
-        user_challenge = UserChallenge.objects.get(id_user=id_user, id_challenge=id_challenge)
+        user_challenge = UserChallenge.objects.get(id_user=request.user, id_challenge=id_challenge)
     except UserChallenge.DoesNotExist:
         return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -131,9 +129,9 @@ def terminate_user_challenge(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-def get_user_challenges(request, user_id):
-    user_challenges = UserChallenge.objects.filter(id_user=user_id)
+@permission_classes([IsAuthenticated])
+def get_user_challenges(request):
+    user_challenges = UserChallenge.objects.filter(id_user=request.user)
 
     if not user_challenges.exists():
         return Response(
