@@ -12,7 +12,7 @@ from .models import Challenge, UserChallenge
 @permission_classes([AllowAny])
 def get_challenges(request):
     challenges = Challenge.objects.all()
-    serializer = ChallengeSerializer(challenges, many=True)
+    serializer = ChallengeSerializer(challenges, many=True, context={'request': request})
     return Response(serializer.data)
 
 
@@ -20,7 +20,7 @@ def get_challenges(request):
 @permission_classes([AllowAny])
 def get_challenge(request, challenge_id):
     challenge = Challenge.objects.get(id=challenge_id)
-    serializer = ChallengeSerializer(challenge, many=False)
+    serializer = ChallengeSerializer(challenge, many=False, context={'request': request})
     return Response(serializer.data)
 
 
@@ -34,7 +34,7 @@ def create_challenge(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    serializer = ChallengeSerializer(data=request.data)
+    serializer = ChallengeSerializer(data=request.data, context={'request': request})
 
     if serializer.is_valid():
         serializer.save()
@@ -61,7 +61,7 @@ def update_challenge(request, challenge_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    serializer = ChallengeSerializer(challenge, data=request.data, partial=True)
+    serializer = ChallengeSerializer(challenge, data=request.data, partial=True, context={'request': request})
 
     if serializer.is_valid():
         serializer.save()
@@ -105,8 +105,8 @@ def complete_user_challenge(request):
     user_challenge.user_complete_date = timezone.now().date()
     user_challenge.user_complete_status = 2
     user_challenge.save()
-    serializer = UserChallengeSerializer(user_challenge)
 
+    serializer = UserChallengeSerializer(user_challenge, data=request.data, partial=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -122,8 +122,8 @@ def terminate_user_challenge(request):
 
     user_challenge.user_complete_status = 4
     user_challenge.save()
-    serializer = UserChallengeSerializer(user_challenge)
 
+    serializer = UserChallengeSerializer(user_challenge, data=request.data, partial=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -138,7 +138,7 @@ def get_user_challenges(request):
             status=status.HTTP_200_OK
         )
 
-    serializer = UserChallengeSerializer(user_challenges, many=True)
+    serializer = UserChallengeSerializer(user_challenges, data=request.data, partial=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -155,7 +155,7 @@ def accept_user_challenge(request, id_challenge):
         id_challenge_id=id_challenge,
         user_complete_status=0  # Not Started
     )
-    serializer = UserChallengeSerializer(user_challenge)
+    serializer = UserChallengeSerializer(user_challenge, context={'request': request})
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -170,5 +170,6 @@ def start_user_challenge(request):
 
     user_challenge.user_complete_status = 1  # In Progress
     user_challenge.save()
-    serializer = UserChallengeSerializer(user_challenge)
+
+    serializer = UserChallengeSerializer(user_challenge, data=request.data, partial=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
