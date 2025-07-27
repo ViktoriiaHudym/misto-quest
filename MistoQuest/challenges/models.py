@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-from django.utils import timezone
+from datetime import date
 
 
 class Challenge(models.Model):
@@ -18,7 +18,7 @@ class Challenge(models.Model):
         default='easy',
     )
 
-    created_date = models.DateField(default=timezone.now)
+    created_date = models.DateField(default=date.today)
     max_duration = models.IntegerField(default=7)
 
     points = models.IntegerField(default=0)
@@ -35,7 +35,7 @@ class Challenge(models.Model):
 class UserChallenge(models.Model):
     id_user = models.ForeignKey(User, on_delete=models.CASCADE)
     id_challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
-    user_pick_up_date = models.DateField(default=timezone.now)
+    user_pick_up_date = models.DateField(default=date.today)
     user_complete_date = models.DateField(null=True, blank=True)
 
     USER_STATUS_CHOICES = [

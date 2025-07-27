@@ -15,6 +15,8 @@ class ChallengeSerializer(ModelSerializer):
 
 
 class UserChallengeSerializer(ModelSerializer):
+    id_challenge = ChallengeSerializer(read_only=True)
+
     class Meta:
         model = UserChallenge
         fields = '__all__'

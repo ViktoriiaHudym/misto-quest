@@ -5,7 +5,6 @@ import '../widgets/app_bottom_nav_bar.dart';
 import 'user_participation_screen.dart';
 import '../widgets/challenge_slider_card.dart';
 
-
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home';
 
@@ -17,7 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Challenge>> _challengesFuture;
-  final PageController _pageController = PageController(viewportFraction: 0.8);
+  // Adjust viewportFraction to control how much of the next/previous cards are visible
+  final PageController _pageController = PageController(viewportFraction: 0.85);
   int _currentIndex = 0;
   int _selectedNavIndex = 0;
 
@@ -38,18 +38,15 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget content;
     switch (_selectedNavIndex) {
       case 0:
-      // Featured Challenges
         content = FutureBuilder<List<Challenge>>(
           future: _challengesFuture,
           builder: _buildChallengesSlider,
         );
         break;
       case 1:
-      // Participating Challenges
         content = const UserParticipationScreen();
         break;
       case 2:
-      // Account & Settings
         content = const Center(
           child: Text('Account & Settings screen (to be implemented)'),
         );
@@ -83,11 +80,13 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Center(child: Text('No challenges available.'));
     }
 
+    // Use Expanded to make the PageView take up available vertical space
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
             'Квести доступні у твоєму місті',
             style: Theme.of(context)
@@ -96,9 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 300,
+        const SizedBox(height: 8),
+        Expanded(
           child: PageView.builder(
             controller: _pageController,
             itemCount: challenges.length,
@@ -107,14 +105,39 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             itemBuilder: (context, index) {
               final challenge = challenges[index];
-              return ChallengeSliderCard(challenge: challenge);
+              return ChallengeSliderCard(
+                challenge: challenge,
+                onAccept: () async {
+                  final api = ApiService();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Accepting challenge...')));
+                  try {
+                    final success = await api.acceptUserChallenge(challenge.id);
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(success ? 'Challenge accepted!' : 'Already accepted!'),
+                        backgroundColor: success ? Colors.green : Colors.orange,
+                      ),
+                    );
+                  } catch (e) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Error: ${e.toString()}'),
+                        backgroundColor: Colors.red));
+                  }
+                },
+              );
             },
           ),
         ),
-        const SizedBox(height: 12),
-        _IndicatorRow(
-          count: challenges.length,
-          currentIndex: _currentIndex,
+        // The page indicator can be placed at the bottom
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20.0),
+          child: _IndicatorRow(
+            count: challenges.length,
+            currentIndex: _currentIndex,
+          ),
         ),
       ],
     );
@@ -135,10 +158,10 @@ class _IndicatorRow extends StatelessWidget {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: isActive ? 16 : 8,
+          width: isActive ? 24 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color: isActive ? Colors.blueAccent : Colors.grey,
+            color: isActive ? Theme.of(context).primaryColor : Colors.grey,
             borderRadius: BorderRadius.circular(4),
           ),
         );

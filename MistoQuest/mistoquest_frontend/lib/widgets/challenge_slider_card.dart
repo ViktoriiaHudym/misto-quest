@@ -3,38 +3,108 @@ import '../models/challenge.dart';
 
 class ChallengeSliderCard extends StatelessWidget {
   final Challenge challenge;
-  const ChallengeSliderCard({Key? key, required this.challenge}) : super(key: key);
+  final VoidCallback onAccept;
+
+  const ChallengeSliderCard({
+    super.key,
+    required this.challenge,
+    required this.onAccept,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+    return Container(
+      // Use a margin for the PageView, not the card itself
+      margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      // Use ClipRRect to clip the child (the Stack) with rounded corners
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.0),
+        child: Stack(
+          fit: StackFit.expand, // Make the stack fill the container
           children: [
-            Text(
-              challenge.title,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold),
+            // 1. Background Image
+            Image.asset(
+              // Replace with your thematic images. You could have a map of challenge types to images.
+              'assets/test.jpg', // Make sure you have a placeholder image in assets
+              fit: BoxFit.cover,
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Text(
-                challenge.description,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
+
+            // 2. Gradient Overlay for Text Readability
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.5, 1.0],
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text('Points: ${challenge.points}'),
+
+            // 3. Text and Button Content
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end, // Align content to the bottom
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    challenge.title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [Shadow(blurRadius: 10, color: Colors.black)],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    challenge.description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white.withOpacity(0.9),
+                      shadows: const [Shadow(blurRadius: 8, color: Colors.black)],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Points: ${challenge.points}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      // 4. Redesigned Button
+                      ElevatedButton(
+                        onPressed: onAccept,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.black, backgroundColor: Colors.white, // Text color
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
+                        child: const Text(
+                          'Accept',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-} 
+}
