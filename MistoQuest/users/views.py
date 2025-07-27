@@ -91,7 +91,7 @@ class UserChallengeListView(APIView):
         # Get all UserChallenge objects for the current user
         user_challenges = UserChallenge.objects.filter(id_user=request.user)
         # Use the nested serializer to include full challenge details for performance
-        serializer = UserChallengeSerializer(user_challenges, many=True)
+        serializer = UserChallengeSerializer(user_challenges, many=True, context={'request': request})
         return Response(serializer.data)
 
 

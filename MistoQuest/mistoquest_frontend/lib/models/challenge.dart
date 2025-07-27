@@ -7,6 +7,7 @@ class Challenge {
   final int maxDuration;
   final int points;
   final bool isActive;
+  final String? imageUrl;
 
   Challenge({
     required this.id,
@@ -17,6 +18,7 @@ class Challenge {
     required this.maxDuration,
     required this.points,
     required this.isActive,
+    this.imageUrl,
   });
 
   factory Challenge.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class Challenge {
       maxDuration: json['max_duration'],
       points: json['points'],
       isActive: json['is_active'],
+      imageUrl: json['image_url'],
     );
   }
 

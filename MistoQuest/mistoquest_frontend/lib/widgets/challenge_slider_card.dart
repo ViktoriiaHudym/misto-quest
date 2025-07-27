@@ -14,22 +14,36 @@ class ChallengeSliderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Use a margin for the PageView, not the card itself
       margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-      // Use ClipRRect to clip the child (the Stack) with rounded corners
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24.0),
         child: Stack(
-          fit: StackFit.expand, // Make the stack fill the container
+          fit: StackFit.expand,
           children: [
-            // 1. Background Image
-            Image.asset(
-              // Replace with your thematic images. You could have a map of challenge types to images.
-              'assets/test.jpg', // Make sure you have a placeholder image in assets
-              fit: BoxFit.cover,
-            ),
+            // Background Image
+            if (challenge.imageUrl != null)
+            // If an image URL exists, load it from the network
+              Image.network(
+                challenge.imageUrl!,
+                fit: BoxFit.cover,
+                // Show a loading indicator
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: CircularProgressIndicator());
+                },
+                // Show an error icon if it fails to load
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.broken_image, size: 48, color: Colors.grey);
+                },
+              )
+            else
+            // Otherwise, show the placeholder asset
+              Image.asset(
+                'assets/test2.jpg',
+                fit: BoxFit.cover,
+              ),
 
-            // 2. Gradient Overlay for Text Readability
+            // Gradient Overlay for Text Readability
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -41,7 +55,7 @@ class ChallengeSliderCard extends StatelessWidget {
               ),
             ),
 
-            // 3. Text and Button Content
+            // Text and Button Content
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -80,7 +94,7 @@ class ChallengeSliderCard extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                      // 4. Redesigned Button
+                      // Accept Button
                       ElevatedButton(
                         onPressed: onAccept,
                         style: ElevatedButton.styleFrom(

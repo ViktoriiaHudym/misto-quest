@@ -25,6 +25,8 @@ class Challenge(models.Model):
 
     is_active = models.BooleanField(default=True)
 
+    image = models.ImageField(upload_to='challenge_images/', null=True, blank=True)
+
     def __str__(self):
         return self.title
 
