@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/challenge.dart';
 
-
 const userStatusChoices = [
   'Not Started',
   'In Progress',
@@ -13,15 +12,15 @@ const userStatusChoices = [
 
 Color getStatusColor(int status) {
   switch (status) {
-    case 1:
+    case 1: // In Progress
       return Colors.yellow.shade700;
-    case 2:
+    case 2: // Completed
       return Colors.green.shade400;
-    case 3:
-    case 4:
+    case 3: // Failed
+    case 4: // Terminated
       return Colors.grey.shade500;
-    default:
-      return Colors.grey.shade300;
+    default: // Not Started
+      return Colors.blue.shade300;
   }
 }
 
@@ -44,71 +43,60 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
     _userChallengesFuture = _apiService.fetchUserChallenges();
   }
 
+  // Helper function to reduce repeated code
+  Future<void> _handleChallengeAction({
+    required Future<bool> Function() apiCall,
+    required String successMessage,
+    required String errorMessage,
+  }) async {
+    try {
+      final success = await apiCall();
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success ? successMessage : 'Action failed. Please try again.'),
+          backgroundColor: success ? Colors.green : Colors.orange,
+        ),
+      );
+
+      if (success) {
+        setState(() {
+          _userChallengesFuture = _apiService.fetchUserChallenges();
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$errorMessage: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _startChallenge(int challengeId) => _handleChallengeAction(
+    apiCall: () => _apiService.startUserChallenge(challengeId),
+    successMessage: 'Challenge started!',
+    errorMessage: 'Failed to start challenge',
+  );
+
+  Future<void> _markAsCompleted(int challengeId) => _handleChallengeAction(
+    apiCall: () => _apiService.completeChallenge(challengeId),
+    successMessage: 'Challenge completed!',
+    errorMessage: 'Failed to complete challenge',
+  );
+
+  Future<void> _stopParticipation(int challengeId) => _handleChallengeAction(
+    apiCall: () => _apiService.terminateChallenge(challengeId),
+    successMessage: 'Participation stopped.',
+    errorMessage: 'Failed to stop participation',
+  );
+
   List<UserChallenge> _filterChallenges(List<UserChallenge> challenges) {
-    if (_selectedStatusFilter == null) {
-      return challenges;
-    }
-    return challenges.where((challenge) => 
-      challenge.userCompleteStatus == _selectedStatusFilter
-    ).toList();
-  }
-
-  Future<void> _markAsCompleted(int challengeId) async {
-    try {
-      await _apiService.completeChallenge(challengeId);
-      
-      // Show success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Challenge marked as completed!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-
-      // Refresh the challenges list
-      setState(() {
-        _userChallengesFuture = _apiService.fetchUserChallenges();
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to complete challenge: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _stopParticipation(int challengeId) async {
-    try {
-      await _apiService.terminateChallenge(challengeId);
-      // Show success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Participation stopped!'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-      // Refresh the challenges list
-      setState(() {
-        _userChallengesFuture = _apiService.fetchUserChallenges();
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to stop participation: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+    if (_selectedStatusFilter == null) return challenges;
+    return challenges.where((c) => c.userCompleteStatus == _selectedStatusFilter).toList();
   }
 
   void _showFilterDialog() {
@@ -169,180 +157,115 @@ class _UserParticipationScreenState extends State<UserParticipationScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<UserChallenge>>(
-        future: _userChallengesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No participating challenges.'));
-          } else {
-            final userChallenges = _filterChallenges(snapshot.data!);
-            
-            if (userChallenges.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.filter_list_off, size: 64, color: Colors.grey),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No challenges with status "${_selectedStatusFilter != null ? userStatusChoices[_selectedStatusFilter!] : 'All'}"',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedStatusFilter = null;
-                        });
-                      },
-                      child: const Text('Clear Filter'),
-                    ),
-                  ],
-                ),
-              );
-            }
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            _userChallengesFuture = _apiService.fetchUserChallenges();
+          });
+        },
+        child: FutureBuilder<List<UserChallenge>>(
+          future: _userChallengesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No participating challenges.'));
+            } else {
+              final userChallenges = _filterChallenges(snapshot.data!);
 
-            return ListView.builder(
-              itemCount: userChallenges.length,
-              itemBuilder: (context, index) {
-                final userChallenge = userChallenges[index];
-                return FutureBuilder<Challenge>(
-                  future: _apiService.fetchChallengeById(userChallenge.idChallenge),
-                  builder: (context, challengeSnapshot) {
-                    if (challengeSnapshot.connectionState == ConnectionState.waiting) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        child: Center(child: CircularProgressIndicator()),
-                      );
-                    } else if (challengeSnapshot.hasError) {
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ListTile(
-                          title: const Text('Error loading challenge'),
-                          subtitle: Text('ID: ${userChallenge.idChallenge}'),
-                        ),
-                      );
-                    } else if (!challengeSnapshot.hasData) {
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: ListTile(
-                          title: const Text('Challenge not found'),
-                          subtitle: Text('ID: ${userChallenge.idChallenge}'),
-                        ),
-                      );
-                    } else {
-                      final challenge = challengeSnapshot.data!;
-                      final status = userChallenge.userCompleteStatus;
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: getStatusColor(status).withAlpha((0.1 * 255).toInt()),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IntrinsicHeight(
-                          child: Row(
+              if (userChallenges.isEmpty) {
+                return const Center(
+                  child: Text('No challenges match the selected filter.'),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: userChallenges.length,
+                itemBuilder: (context, index) {
+                  final userChallenge = userChallenges[index];
+                  final challenge = userChallenge.challenge;
+                  final status = userChallenge.userCompleteStatus;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: getStatusColor(status), width: 1.5),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 12,
-                                decoration: BoxDecoration(
-                                  color: getStatusColor(status),
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    bottomLeft: Radius.circular(12),
+                              Expanded(
+                                child: Text(
+                                  challenge.title,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              challenge.title,
-                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: getStatusColor(status).withAlpha((0.2 * 255).toInt()),
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              userStatusChoices[status],
-                                              style: TextStyle(
-                                                color: getStatusColor(status),
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        challenge.description,
-                                        maxLines: 3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text('Points: ${challenge.points}'),
-                                      if (status == 1) ...[
-                                        const SizedBox(height: 16),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: ElevatedButton(
-                                                onPressed: () => _markAsCompleted(userChallenge.idChallenge),
-                                                child: const Text('Mark as Completed'),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: OutlinedButton(
-                                                onPressed: () => _stopParticipation(userChallenge.idChallenge),
-                                                child: const Text('Stop Participation'),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ],
-                                  ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: getStatusColor(status).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  userStatusChoices[status],
+                                  style: TextStyle(color: getStatusColor(status), fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    }
-                  },
-                );
-              },
-            );
-          }
-        },
+                          const SizedBox(height: 8),
+                          Text(
+                            challenge.description,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 12),
+                          Text('Points: ${challenge.points}'),
+
+                          if (status == 0) ...[ // Not Started
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(child: ElevatedButton(onPressed: () => _startChallenge(challenge.id), child: const Text('Start'))),
+                                const SizedBox(width: 12),
+                                Expanded(child: OutlinedButton(onPressed: () => _stopParticipation(challenge.id), child: const Text('Stop Participation'))),
+                              ],
+                            ),
+                          ],
+                          if (status == 1) ...[ // In Progress
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(child: ElevatedButton(onPressed: () => _markAsCompleted(challenge.id), child: const Text('Mark as Completed'))),
+                                const SizedBox(width: 12),
+                                Expanded(child: OutlinedButton(onPressed: () => _stopParticipation(challenge.id), child: const Text('Stop Participation'))),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
 }
-
-

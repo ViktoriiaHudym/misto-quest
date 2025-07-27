@@ -1,4 +1,3 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -140,4 +139,36 @@ def get_user_challenges(request):
         )
 
     serializer = UserChallengeSerializer(user_challenges, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def accept_user_challenge(request, id_challenge):
+    current_user = request.user
+
+    if UserChallenge.objects.filter(id_user=current_user, id_challenge_id=id_challenge).exists():
+        return Response({"detail": "Challenge already accepted by user."}, status=status.HTTP_400_BAD_REQUEST)
+
+    user_challenge = UserChallenge.objects.create(
+        id_user=current_user,
+        id_challenge_id=id_challenge,
+        user_complete_status=0  # Not Started
+    )
+    serializer = UserChallengeSerializer(user_challenge)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_user_challenge(request):
+    id_challenge = request.data.get('id_challenge')
+    try:
+        user_challenge = UserChallenge.objects.get(id_user=request.user, id_challenge=id_challenge)
+    except UserChallenge.DoesNotExist:
+        return Response({"error": "UserChallenge not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    user_challenge.user_complete_status = 1  # In Progress
+    user_challenge.save()
+    serializer = UserChallengeSerializer(user_challenge)
     return Response(serializer.data, status=status.HTTP_200_OK)
