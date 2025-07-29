@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../models/challenge.dart';
+import '../widgets/challenge_card.dart';
 
 
 class ChallengeListScreen extends StatefulWidget {
@@ -42,19 +43,30 @@ class ChallengeListScreenState extends State<ChallengeListScreen> {
               itemCount: challengeList.length,
               itemBuilder: (context, index) {
                 final challenge = challengeList[index];
-                return ListTile(
-                  title: Text(challenge.title),
-                  subtitle: Text(challenge.description),
-                  trailing: Text('${challenge.points} pts'),
-                  // onTap: () {
-                  //   // Navigate to challenge detail screen (if necessary)
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => ChallengeDetailScreen(challengeId: challenge.id),
-                  //     ),
-                  //   );
-                  // },
+
+                return ChallengeCard(
+                  challenge: challenge,
+                  onAccept: () async {
+                    final api = ApiService();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Accepting challenge...'))
+                    );
+                    try {
+                      final success = await api.acceptUserChallenge(challenge.id);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(success ? 'Challenge accepted!' : 'Already accepted!'),
+                          backgroundColor: success ? Colors.green : Colors.orange,
+                        ),
+                      );
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red)
+                      );
+                    }
+                  },
                 );
               },
             );

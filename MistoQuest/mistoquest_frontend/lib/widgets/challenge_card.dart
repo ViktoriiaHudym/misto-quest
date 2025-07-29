@@ -1,80 +1,44 @@
 import 'package:flutter/material.dart';
 import '../models/challenge.dart';
 
-
 class ChallengeCard extends StatelessWidget {
-  final VoidCallback onTap;
   final Challenge challenge;
+  final VoidCallback onAccept; 
 
-  const ChallengeCard({super.key, required this.onTap, required this.challenge});
+  const ChallengeCard({
+    super.key,
+    required this.challenge,
+    required this.onAccept,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 10,
-      color: const Color(0XFF5B595A),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        height: 455,
-        width: 280,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-            color: const Color(0XFF5B595A),
-            borderRadius: BorderRadius.circular(20)),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                height: 190,
-                width: 190,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage('assets/Challenge-PNG-File.png'),  // Use placeholder or image for the challenge
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
             Text(
               challenge.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 5),
-            Expanded(
-              child: Text(
-                challenge.description,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w200,
+            const SizedBox(height: 8),
+            Text(challenge.description, maxLines: 3, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Points: ${challenge.points}'),
+                // This is the button that was missing from your UI
+                ElevatedButton(
+                  onPressed: onAccept, // The button now uses the function
+                  child: const Text('Accept'),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: onTap,
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                fixedSize: const Size(double.maxFinite, 44),
-              ),
-              child: const Text(
-                "JOIN CHALLENGE",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              ],
             ),
           ],
         ),

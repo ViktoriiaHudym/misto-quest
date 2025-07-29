@@ -7,6 +7,8 @@ urlpatterns = [
     path('user/complete_challenge', views.complete_user_challenge),
     path('user/terminate_challenge', views.terminate_user_challenge),
     path('user/', views.get_user_challenges),
+    path('<int:id_challenge>/accept/', views.accept_user_challenge, name='accept_challenge'),
+    path('user/start_challenge', views.start_user_challenge),
     path('<str:challenge_id>/update/', views.update_challenge),
     path('<str:challenge_id>/delete/', views.delete_challenge),
     path('<str:challenge_id>/', views.get_challenge),
